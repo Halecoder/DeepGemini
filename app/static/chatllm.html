@@ -3,372 +3,684 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepGemini - ChatLLM </title>
+    <title>DeepGemini - Unified Dashboard</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
-    <link href="css/chatllm.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        window.MathJax = {
-          tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']],
-            processEscapes: true,
-            processEnvironments: true,
-            tags: 'ams'
-          },
-          options: {
-            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'a', 'tips'],
-            ignoreHtmlClass: 'not_math'
-          },
-          svg: { fontCache: 'global' }
-        };
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563EB', // Blue-600
+                        'primary-hover': '#1D4ED8', // Blue-700
+                        secondary: '#F3F4F6', // Gray-100
+                        'text-primary': '#1F2937', // Gray-800
+                        'text-secondary': '#4B5563', // Gray-600
+                        'text-muted': '#6B7280', // Gray-500
+                        'border-color': '#E5E7EB', // Gray-200
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <style>
-        /* 可调整高度的文本区域 */
-        .resizable-textarea {
-            position: relative;
-            resize: none;
-            min-height: 50px;
-            max-height: 300px;
-            transition: height 0.2s ease;
-        }
-        
-        /* 自定义调整大小的手柄 */
-        .resizable-textarea-container {
-            position: relative;
-            flex: 1;
-        }
-        
-        .resize-handle {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 20px;
-            height: 20px;
-            background-color: transparent;
-            cursor: ns-resize;
-            z-index: 10;
-        }
-        
-        .resize-handle::before {
-            content: '';
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            width: 8px;
-            height: 8px;
-            border-top: 2px solid rgba(0, 0, 0, 0.3);
-            border-right: 2px solid rgba(0, 0, 0, 0.3);
-        }
-        
-        /* 消息名称样式 */
-        .message-name {
-            font-size: 0.85rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #555;
-        }
-
-        .ai .message-name {
-            color: #2c7be5;
-        }
-
-        .system .message-name {
-            color: #d9534f;
-        }
-
-        .user .message-name {
-            color: #4bbf73;
-        }
-
-        /* 打字指示器 */
-        .typing-indicator {
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .typing-indicator span {
-            height: 8px;
-            width: 8px;
-            background: #2c7be5;
-            display: block;
-            border-radius: 50%;
-            margin-right: 5px;
-            animation: typing 1s infinite ease-in-out;
-        }
-
-        .typing-indicator span:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.3s;
-            margin-right: 0;
-        }
-
-        @keyframes typing {
-            0% {
-                transform: scale(1);
-                opacity: 0.7;
-            }
-            50% {
-                transform: scale(1.5);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 0.7;
-            }
-        }
-    </style>
-    <!-- Highlight.js 代码高亮库，必须在自定义JS前加载 -->
+    
+    <!-- Icons & Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Code Highlight & Markdown -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
     <script src="js/highlight.min.js"></script>
-    <!-- marked.js 依赖 -->
     <script src="js/marked.min.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        if (window.hljs) {
-          hljs.highlightAll();
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+        /* Chat Message Styles */
+        .message { max-width: 85%; }
+        .message.user { border-radius: 1rem 1rem 0 1rem; }
+        .message.ai { border-radius: 1rem 1rem 1rem 0; }
+        
+        /* Sidebar Active State */
+        .sidebar-menu li.active {
+            background-color: #EFF6FF;
+            color: #2563EB;
+            border-right: 3px solid #2563EB;
         }
-      });
-    </script>
+
+        /* Modal Transitions */
+        .modal { transition: opacity 0.2s ease-in-out; }
+        .modal.hidden { opacity: 0; pointer-events: none; }
+        .modal.flex { opacity: 1; pointer-events: auto; }
+    </style>
 </head>
-<body>
+<body class="bg-gray-50 text-text-primary h-screen flex overflow-hidden selection:bg-blue-100">
+
     <!-- Sidebar -->
-    <nav class="sidebar">
-        <button class="sidebar-toggle" onclick="toggleSidebar()">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <div class="sidebar-header">
-            <h3>DeepGemini </h3>
+    <aside class="w-64 bg-white border-r border-border-color flex flex-col flex-shrink-0 z-20 transition-all duration-300" id="sidebar">
+        <!-- Logo -->
+        <div class="h-16 flex items-center px-6 border-b border-border-color">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mr-3 text-white shadow-sm">
+                <i class="fas fa-sparkles text-sm"></i>
+            </div>
+            <h1 class="text-xl font-bold text-gray-800 tracking-tight">DeepGemini</h1>
         </div>
-        <ul class="sidebar-menu">
-            <li data-page="models">
-                <i class="fas fa-cube"></i>
-                <span data-translate="modelManagement">模型管理</span>
-            </li>
-            <li data-page="workflows">
-                <i class="fas fa-project-diagram"></i>
-                <span data-translate="workflowManagement">接力链管理</span>
-            </li>
-            <li data-page="roles">
-                <i class="fas fa-user-tag"></i>
-                <span data-translate="roleManagement">角色管理</span>
-            </li>
-            <li data-page="groups">
-                <i class="fas fa-users"></i>
-                <span data-translate="groupManagement">讨论组管理</span>
-            </li>
-            <li class="active" data-page="chatllm">
-                <i class="fas fa-comments"></i>
-                <span data-translate="chatInterface">对话界面</span>
-            </li>
-            <li data-page="settings">
-                <i class="fas fa-cog"></i>
-                <span data-translate="systemSettings">系统设置</span>
-            </li>
-        </ul>
-        <div class="sidebar-footer">
-            <div class="sidebar-footer-controls">
-                <div class="control-item language-control">
-                    <i class="fas fa-globe"></i>
-                    <span data-translate="language">语言</span>
-                    <select id="languageSelect" onchange="changeLanguage(this.value)">
-                        <option value="en">English</option>
-                        <option value="zh">简体中文</option>
-                    </select>
-                    <div class="language-popup">
-                        <select id="languageSelectPopup" onchange="changeLanguage(this.value)">
-                            <option value="en">English</option>
-                            <option value="zh">简体中文</option>
-                        </select>
+
+        <!-- Navigation -->
+        <div class="flex-1 overflow-y-auto py-6 px-3">
+            <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Menu</h3>
+            <ul class="sidebar-menu space-y-1">
+                <li data-page="chatllm" class="active flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-comments w-5 text-center mr-3 text-gray-400"></i>
+                    <span data-translate="chatInterface">Chat</span>
+                </li>
+                <li data-page="models" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-cube w-5 text-center mr-3 text-gray-400"></i>
+                    <span data-translate="modelManagement">Models</span>
+                </li>
+                <li data-page="workflows" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-project-diagram w-5 text-center mr-3 text-gray-400"></i>
+                    <span data-translate="workflowManagement">Relay Chain</span>
+                </li>
+                <li data-page="roles" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-user-tag w-5 text-center mr-3 text-gray-400"></i>
+                    <span data-translate="roleManagement">Roles</span>
+                </li>
+                <li data-page="groups" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-users w-5 text-center mr-3 text-gray-400"></i>
+                    <span data-translate="groupManagement">Groups</span>
+                </li>
+                <li data-page="settings" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-cog w-5 text-center mr-3 text-gray-400"></i>
+                    <span data-translate="systemSettings">Settings</span>
+                </li>
+            </ul>
+
+            <!-- History Section -->
+            <div class="mt-8">
+                <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">History</h3>
+                <div class="space-y-1 px-1" id="history-list">
+                    <div class="px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md cursor-pointer truncate transition-colors">
+                        <i class="far fa-comment-alt text-gray-400 mr-2"></i>
+                        New Conversation
                     </div>
-                </div>
-                <div class="control-item dark-mode-control" onclick="toggleTheme()">
-                    <i class="fas fa-moon"></i>
-                    <span data-translate="darkMode">夜间模式</span>
-                </div>
-                <div class="control-item logout-control" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span data-translate="logout">退出登录</span>
                 </div>
             </div>
         </div>
-    </nav>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="content-page" id="chatllm-page">
-            <div class="chat-container">
-                <!-- Chat Interface Header -->
-                <div class="chat-header">
-                    <div class="chat-mode-selector">
-                        <div class="btn-group" role="group">
-                            <input type="radio" class="btn-check" name="chatMode" id="singleModel" value="single" autocomplete="off" checked>
-                            <label class="btn btn-outline-primary" for="singleModel" data-translate="singleModel">单个模型</label>
-                            
-                            <input type="radio" class="btn-check" name="chatMode" id="relayChain" value="relay" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="relayChain" data-translate="relayChain">接力链</label>
-                            
-                            <input type="radio" class="btn-check" name="chatMode" id="roleChat" value="role" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="roleChat" data-translate="roleChat">角色对话</label>
-                            
-                            <input type="radio" class="btn-check" name="chatMode" id="discussionGroup" value="group" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="discussionGroup" data-translate="discussionGroup">讨论组</label>
-                        </div>
-                    </div>
-                    <div class="chat-header-actions-group-mode d-none" id="discussion-export-wrapper">
-                    </div>
+        <!-- Sidebar Footer -->
+        <div class="p-4 border-t border-border-color bg-gray-50">
+            <div class="flex items-center justify-between text-gray-500">
+                <div class="relative group cursor-pointer">
+                    <i class="fas fa-globe hover:text-primary transition-colors"></i>
+                    <select id="languageSelect" class="absolute inset-0 opacity-0 cursor-pointer">
+                        <option value="en">English</option>
+                        <option value="zh">简体中文</option>
+                    </select>
                 </div>
-
-                <!-- Chat Selection Settings -->
-                <div class="chat-settings">
-                    <!-- Single Model Settings -->
-                    <div class="chat-setting-section" id="single-model-settings">
-                        <div class="form-group">
-                            <label data-translate="selectModel">选择模型</label>
-                            <select class="form-select" id="singleModelSelect"></select>
-                        </div>
-                    </div>
-
-                    <!-- Relay Chain Settings -->
-                    <div class="chat-setting-section d-none" id="relay-chain-settings">
-                        <div class="form-group">
-                            <label data-translate="selectRelayChain">选择接力链</label>
-                            <select class="form-select" id="relayChainSelect"></select>
-                        </div>
-                    </div>
-
-                    <!-- Role Chat Settings -->
-                    <div class="chat-setting-section d-none" id="role-chat-settings">
-                        <div class="form-group">
-                            <label data-translate="selectRole">选择角色</label>
-                            <select class="form-select" id="roleChatSelect"></select>
-                        </div>
-                    </div>
-
-                    <!-- Discussion Group Settings -->
-                    <div class="chat-setting-section d-none" id="discussion-group-settings">
-                        <div class="form-group d-flex align-items-center justify-content-between">
-                            <div class="flex-grow-1">
-                                <label data-translate="selectDiscussionGroup">选择讨论组</label>
-                                <select class="form-select" id="discussionGroupSelect"></select>
-                            </div>
-                        </div>
-                    </div>
+                <div id="toggleThemeBtn" class="cursor-pointer hover:text-primary transition-colors">
+                    <i class="fas fa-moon"></i>
                 </div>
-
-                <!-- Chat Messages -->
-                <div class="chat-messages" id="chatMessages">
-                    <div class="welcome-message">
-                        <h4 data-translate="welcomeToChat">ChatDeepGemini</h4>
-                    </div>
-                    <!-- 会议总结消息容器，确保会议总结内容和导出按钮都插入这里 -->
-                    <div id="meeting-summary-container" style="position:relative;"></div>
+                <div id="logoutBtn" class="cursor-pointer hover:text-red-500 transition-colors">
+                    <i class="fas fa-sign-out-alt"></i>
                 </div>
+            </div>
+        </div>
+    </aside>
 
-                <!-- Discussion Group Participant Input (Only shown in Discussion Group mode when human input needed) -->
-                <div class="human-input-area d-none" id="humanInputArea">
-                    <div class="human-input-header">
-                        <div class="human-role-info">
-                            <span data-translate="speakingAs">正在以</span>
-                            <span class="human-role-name" id="humanRoleName">人类</span>
-                            <span data-translate="identity">身份发言</span>
-                        </div>
-                    </div>
-                    <div class="human-input-content d-flex align-items-center">
-                        <div class="resizable-textarea-container">
-                            <textarea class="form-control resizable-textarea" id="humanInputMessage" placeholder="输入您的发言内容..."></textarea>
-                            <div class="resize-handle" id="humanInputResizeHandle"></div>
-                        </div>
-                        <button class="btn btn-primary ms-2 align-self-center" id="sendHumanInput" data-translate="submitMessage">提交发言</button>
-                    </div>
-                </div>
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-screen relative bg-white overflow-hidden">
+        
+        <!-- ==================== CHAT PAGE ==================== -->
+        <div id="chatllm-page" class="content-page h-full flex flex-col">
+            <!-- Header -->
+            <header class="h-16 flex-shrink-0 border-b border-border-color bg-white flex items-center justify-between px-6 z-10">
+                <button id="toggleSidebarBtn" class="lg:hidden mr-4 text-gray-500">
+                    <i class="fas fa-bars"></i>
+                </button>
 
-                <!-- Chat Input (隐藏在讨论组模式) -->
-                <div class="chat-input d-flex align-items-center" id="normalChatInput">
-                    <div class="resizable-textarea-container">
-                        <textarea class="form-control resizable-textarea" id="userMessage" placeholder="输入消息..."></textarea>
-                        <div class="resize-handle" id="userMessageResizeHandle"></div>
-                    </div>
-                    <button class="btn btn-primary ms-2 align-self-center" id="sendMessage" data-translate="send">发送</button>
+                <!-- Chat Mode Selector -->
+                <div class="flex p-1 bg-gray-100 rounded-lg">
+                    <label class="cursor-pointer px-4 py-1.5 text-sm font-medium rounded-md transition-all has-[:checked]:bg-white has-[:checked]:text-primary has-[:checked]:shadow-sm text-gray-500">
+                        <input type="radio" name="chatMode" value="single" class="sr-only" checked>
+                        <span data-translate="singleModel">Model</span>
+                    </label>
+                    <label class="cursor-pointer px-4 py-1.5 text-sm font-medium rounded-md transition-all has-[:checked]:bg-white has-[:checked]:text-primary has-[:checked]:shadow-sm text-gray-500">
+                        <input type="radio" name="chatMode" value="relay" class="sr-only">
+                        <span data-translate="relayChain">Relay</span>
+                    </label>
+                    <label class="cursor-pointer px-4 py-1.5 text-sm font-medium rounded-md transition-all has-[:checked]:bg-white has-[:checked]:text-primary has-[:checked]:shadow-sm text-gray-500">
+                        <input type="radio" name="chatMode" value="role" class="sr-only">
+                        <span data-translate="roleChat">Role</span>
+                    </label>
+                    <label class="cursor-pointer px-4 py-1.5 text-sm font-medium rounded-md transition-all has-[:checked]:bg-white has-[:checked]:text-primary has-[:checked]:shadow-sm text-gray-500">
+                        <input type="radio" name="chatMode" value="group" class="sr-only">
+                        <span data-translate="discussionGroup">Group</span>
+                    </label>
                 </div>
                 
-                <!-- 讨论组主题发送区域 (只在讨论组模式显示) -->
-                <div class="chat-input d-none d-flex align-items-center gap-2" id="discussionTopicInput">
-                    <div class="resizable-textarea-container">
-                        <textarea class="form-control resizable-textarea" id="discussionTopicMessage" placeholder="输入讨论主题..."></textarea>
-                        <div class="resize-handle" id="discussionTopicResizeHandle"></div>
+                <div id="discussion-export-wrapper" class="hidden ml-auto"></div>
+            </header>
+
+            <!-- Context Bar -->
+            <div class="px-6 py-3 bg-gray-50 border-b border-border-color flex items-center gap-4">
+                <div class="chat-setting-section flex-1 max-w-md" id="single-model-settings">
+                    <select class="w-full border border-gray-300 rounded-lg text-sm py-2 px-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white" id="singleModelSelect"></select>
+                </div>
+                <div class="chat-setting-section hidden flex-1 max-w-md" id="relay-chain-settings">
+                    <select class="w-full border border-gray-300 rounded-lg text-sm py-2 px-3 bg-white" id="relayChainSelect"></select>
+                </div>
+                <div class="chat-setting-section hidden flex-1 max-w-md" id="role-chat-settings">
+                    <select class="w-full border border-gray-300 rounded-lg text-sm py-2 px-3 bg-white" id="roleChatSelect"></select>
+                </div>
+                <div class="chat-setting-section hidden flex-1 max-w-md" id="discussion-group-settings">
+                    <select class="w-full border border-gray-300 rounded-lg text-sm py-2 px-3 bg-white" id="discussionGroupSelect"></select>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6" id="chatMessages">
+                <div class="text-center text-gray-400 mt-20">
+                    <div class="w-16 h-16 bg-blue-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-robot text-2xl"></i>
                     </div>
-                    <button class="btn btn-primary ms-2 align-self-center" id="startDiscussionBtn" data-translate="startDiscussion">开始讨论</button>
+                    <h4 class="text-xl font-semibold text-gray-700" data-translate="welcomeToChat">Welcome to DeepGemini</h4>
+                    <p class="text-sm mt-2">Select a mode and start conversing.</p>
+                </div>
+                <div id="meeting-summary-container"></div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-6 bg-white border-t border-border-color">
+                <div class="max-w-4xl mx-auto">
+                    <!-- Human Input (Group Mode) -->
+                    <div class="hidden mb-4 bg-purple-50 p-4 rounded-lg border border-purple-100" id="humanInputArea">
+                        <div class="flex items-center mb-2 text-sm text-purple-700 font-medium">
+                            <i class="fas fa-user-circle mr-2"></i>
+                            <span data-translate="speakingAs">Speaking as</span>
+                            <span class="font-bold mx-1" id="humanRoleName">Human</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <textarea class="w-full border-purple-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 outline-none resize-y min-h-[60px]" id="humanInputMessage" placeholder="Enter your response..."></textarea>
+                            <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors whitespace-nowrap self-end" id="sendHumanInput">Submit</button>
+                        </div>
+                    </div>
+
+                    <!-- Main Input -->
+                    <div class="flex items-end gap-3" id="normalChatInput">
+                        <div class="flex-1 relative">
+                            <textarea class="w-full border border-gray-300 rounded-xl px-4 py-3 pr-12 bg-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-y min-h-[50px] shadow-sm" id="userMessage" placeholder="Type a message..."></textarea>
+                            <button class="absolute right-3 bottom-3 text-gray-400 hover:text-gray-600 p-1">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                        </div>
+                        <button class="bg-primary hover:bg-primary-hover text-white rounded-xl w-12 h-12 flex items-center justify-center shadow-md transition-transform active:scale-95" id="sendMessage">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                        <button class="bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 rounded-xl w-12 h-12 flex items-center justify-center shadow-sm transition-colors" id="pauseBtn" title="Pause Discussion">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                    </div>
+
+                    <!-- Discussion Topic Input -->
+                    <div class="hidden flex items-end gap-3" id="discussionTopicInput">
+                        <textarea class="flex-1 border border-gray-300 rounded-xl px-4 py-3 bg-white focus:ring-2 focus:ring-primary outline-none resize-y min-h-[50px]" id="discussionTopicMessage" placeholder="Enter discussion topic..."></textarea>
+                        <button class="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-xl font-medium shadow-md transition-colors whitespace-nowrap" id="startDiscussionBtn">Start Discussion</button>
+                    </div>
+                    
+                    <div class="text-center mt-2">
+                        <span class="text-xs text-gray-400">DeepGemini can make mistakes. Check important info.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== MODELS PAGE ==================== -->
+        <div id="models-page" class="content-page hidden h-full overflow-y-auto bg-gray-50 p-6 md:p-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800" data-translate="modelManagement">Model Management</h2>
+                        <p class="text-gray-500 mt-1">Configure and manage your AI models</p>
+                    </div>
+                    <button id="add-model-btn" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg flex items-center shadow-sm transition-colors">
+                        <i class="fas fa-plus mr-2"></i> <span data-translate="addNewModel">Add New Model</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="modelsList">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== WORKFLOWS PAGE ==================== -->
+        <div id="workflows-page" class="content-page hidden h-full overflow-y-auto bg-gray-50 p-6 md:p-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800" data-translate="workflowManagement">Workflow Management</h2>
+                        <p class="text-gray-500 mt-1" data-translate="workflowDescription">Configure and manage your AI model workflows</p>
+                    </div>
+                    <button id="add-config-btn" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg flex items-center shadow-sm transition-colors">
+                        <i class="fas fa-plus mr-2"></i> <span data-translate="addNewWorkflow">Add New Workflow</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="configurationsList">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ROLES PAGE ==================== -->
+        <div id="roles-page" class="content-page hidden h-full overflow-y-auto bg-gray-50 p-6 md:p-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800" data-translate="roleManagement">Role Management</h2>
+                        <p class="text-gray-500 mt-1" data-translate="roleDescription">Create and manage AI roles</p>
+                    </div>
+                    <button id="add-role-btn" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg flex items-center shadow-sm transition-colors">
+                        <i class="fas fa-plus mr-2"></i> <span data-translate="addRole">Add Role</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="rolesList">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== GROUPS PAGE ==================== -->
+        <div id="groups-page" class="content-page hidden h-full overflow-y-auto bg-gray-50 p-6 md:p-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800" data-translate="groupManagement">Group Management</h2>
+                        <p class="text-gray-500 mt-1" data-translate="groupDescription">Create and manage discussion groups</p>
+                    </div>
+                    <button id="add-group-btn" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg flex items-center shadow-sm transition-colors">
+                        <i class="fas fa-plus mr-2"></i> <span data-translate="addGroup">Add Group</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="groupsList">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SETTINGS PAGE ==================== -->
+        <div id="settings-page" class="content-page hidden h-full overflow-y-auto bg-gray-50 p-6 md:p-8">
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-border-color overflow-hidden flex min-h-[600px]">
+                <!-- Settings Sidebar -->
+                <div class="w-64 bg-gray-50 border-r border-border-color p-4">
+                    <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2">Settings</h3>
+                    <div class="space-y-1 settings-nav">
+                        <div class="settings-nav-item active px-3 py-2 text-sm font-medium rounded-md cursor-pointer bg-white text-primary shadow-sm" data-section="api-keys">
+                            <i class="fas fa-key w-5 text-center mr-2"></i> API Keys
+                        </div>
+                        <div class="settings-nav-item px-3 py-2 text-sm font-medium rounded-md cursor-pointer text-gray-600 hover:bg-white hover:shadow-sm transition-all" data-section="general">
+                            <i class="fas fa-sliders-h w-5 text-center mr-2"></i> General
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Content -->
+                <div class="flex-1 p-8">
+                    <!-- API Keys -->
+                    <div class="settings-section active" id="api-keys-section">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-gray-800" data-translate="apiKeyManagement">API Key Management</h3>
+                            <button id="add-apikey-btn" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                                <i class="fas fa-plus mr-1"></i> Add Key
+                            </button>
+                        </div>
+                        <div class="api-keys-list space-y-3">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+                    
+                    <!-- General Settings -->
+                    <div class="settings-section hidden" id="general-section">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6" data-translate="generalSettings">General Settings</h3>
+                        <div class="max-w-md">
+                            <h4 class="text-sm font-semibold text-gray-900 mb-4" data-translate="adminCredentials">Admin Credentials</h4>
+                            <form id="credentialsForm" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="currentPassword">Current Password</label>
+                                    <input type="password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="current_password" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="newUsername">New Username</label>
+                                    <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="new_username">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="newPassword">New Password</label>
+                                    <input type="password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="new_password">
+                                </div>
+                                <button id="updateCredentialsBtn" type="button" class="bg-primary hover:bg-primary-hover text-white px-6 py-2 rounded-lg mt-2 transition-colors">
+                                    <span data-translate="updateCredentials">Update</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Loading Spinner -->
-    <div class="loading-spinner" id="loadingSpinner" style="display: none;">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">加载中...</span>
+    <!-- ==================== MODALS ==================== -->
+    
+    <!-- Modal Overlay Backdrop (Shared) -->
+    <div id="modalBackdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+
+    <!-- Add Model Modal -->
+    <div id="addModelModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h5 class="text-lg font-bold text-gray-800" data-translate="addNewModel">Add New Model</h5>
+                <button id="closeAddModelBtn" type="button" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="addModelForm" class="space-y-4">
+                    <input type="hidden" name="model_id">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="customName">Custom Name</label>
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="name" required placeholder="Enter custom name">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                            <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="api_key" required placeholder="sk-...">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">API URL</label>
+                            <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="api_url" required placeholder="https://api.example.com/v1">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Model Name</label>
+                        <div class="flex gap-2">
+                            <select class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" id="modelNameSelect">
+                                <option value="">Enter credentials first</option>
+                            </select>
+                            <input type="text" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none hidden" id="modelNameInput" name="model_name" placeholder="Enter manually">
+                            <button id="toggleModelNameInputBtn" type="button" class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1" id="modelLoadStatus"></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                            <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="type">
+                                <option value="reasoning">Reasoning</option>
+                                <option value="execution">Execution</option>
+                                <option value="both">Both</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Provider</label>
+                            <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="provider">
+                                <option value="deepseek">DeepSeek</option>
+                                <option value="google">Google</option>
+                                <option value="anthropic">Anthropic</option>
+                                <option value="openai">OpenAI</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Params -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Temperature</label>
+                            <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none" name="temperature" value="0.7" step="0.1">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Top P</label>
+                            <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none" name="top_p" value="1.0" step="0.1">
+                        </div>
+                    </div>
+                    <!-- Checkboxes -->
+                    <div class="flex gap-6">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="enable_tools" id="enableTools" class="w-4 h-4 text-primary rounded focus:ring-primary">
+                            <span class="text-sm font-medium text-gray-700">Enable Tools</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="enable_thinking" id="enableThinking" class="w-4 h-4 text-primary rounded focus:ring-primary">
+                            <span class="text-sm font-medium text-gray-700">Enable Thinking</span>
+                        </label>
+                    </div>
+                    <!-- Tools Config (Hidden by default) -->
+                    <div id="toolsConfig" class="hidden space-y-3 bg-gray-50 p-4 rounded-lg">
+                         <label class="block text-sm font-medium text-gray-700">Tools JSON</label>
+                         <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 font-mono text-xs" name="tools" rows="3"></textarea>
+                    </div>
+                    <!-- Thinking Config (Hidden by default) -->
+                    <div id="thinkingConfig" class="hidden bg-gray-50 p-4 rounded-lg">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Budget Tokens</label>
+                        <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-2" name="thinking_budget_tokens" value="16000">
+                    </div>
+                    
+                    <!-- Custom Params -->
+                    <div>
+                         <label class="block text-sm font-medium text-gray-700 mb-2">Custom Parameters</label>
+                         <div id="customParametersContainer" class="space-y-2"></div>
+                         <button id="addCustomParamBtn" type="button" class="mt-2 text-sm text-primary hover:text-primary-hover font-medium">
+                             <i class="fas fa-plus mr-1"></i> Add Parameter
+                         </button>
+                    </div>
+                </form>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 rounded-b-xl">
+                <button id="cancelAddModelBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium">Cancel</button>
+                <button id="saveModelBtn" type="button" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg font-medium shadow-sm">Save Model</button>
+            </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="app.js"></script>
-    <script src="js/thinking.js"></script>
-    <script src="js/chatllm.js"></script>
-    
-    <!-- 自定义调整大小的脚本 -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 获取所有调整大小的手柄和对应的文本区域
-            const resizeHandles = document.querySelectorAll('.resize-handle');
-            
-            resizeHandles.forEach(handle => {
-                handle.addEventListener('mousedown', initResize);
-            });
-            
-            function initResize(e) {
-                e.preventDefault();
-                
-                // 获取当前手柄对应的文本区域
-                const textarea = e.target.parentElement.querySelector('textarea');
-                const initialHeight = textarea.offsetHeight;
-                const initialY = e.clientY;
-                
-                // 添加鼠标移动和鼠标释放事件监听器
-                document.addEventListener('mousemove', resize);
-                document.addEventListener('mouseup', stopResize);
-                
-                function resize(e) {
-                    // 计算高度变化 - 反转方向（向上增加高度，向下减小高度）
-                    const deltaY = initialY - e.clientY;
-                    const newHeight = initialHeight + deltaY;
+    <!-- Add Configuration Modal -->
+    <div id="addConfigModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h5 class="text-lg font-bold text-gray-800">Add New Relay Chain</h5>
+                <button id="closeConfigModalBtn" type="button" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="addConfigForm" class="space-y-4">
+                    <input type="hidden" name="config_id">
+                    <div class="flex gap-4 items-center">
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                            <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="name" required>
+                        </div>
+                        <label class="flex items-center gap-2 cursor-pointer mt-6">
+                            <input type="checkbox" name="is_active" value="true" checked class="w-4 h-4 text-primary rounded focus:ring-primary">
+                            <span class="text-sm font-medium text-gray-700">Active</span>
+                        </label>
+                    </div>
                     
-                    // 设置新高度，确保在最小和最大高度范围内
-                    if (newHeight >= 50 && newHeight <= 300) {
-                        textarea.style.height = newHeight + 'px';
-                    }
-                }
-                
-                function stopResize() {
-                    // 移除事件监听器
-                    document.removeEventListener('mousemove', resize);
-                    document.removeEventListener('mouseup', stopResize);
-                }
-            }
-        });
-    </script>
+                    <div id="configSteps" class="space-y-4">
+                        <!-- Steps injected here -->
+                    </div>
+                    
+                    <button id="addConfigStepBtn" type="button" class="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-primary hover:text-primary transition-colors font-medium flex items-center justify-center">
+                        <i class="fas fa-plus mr-2"></i> Add Step
+                    </button>
+                </form>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 rounded-b-xl">
+                <button id="cancelConfigModalBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium">Close</button>
+                <button id="saveConfigBtn" type="button" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg font-medium shadow-sm">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Role Modal -->
+    <div id="addRoleModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h5 class="text-lg font-bold text-gray-800" data-translate="addNewRole">Add New Role</h5>
+                <button id="closeRoleModalBtn" type="button" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="addRoleForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="roleName">Role Name</label>
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="name" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="roleDescription">Description</label>
+                        <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="description" rows="2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="personality">Personality</label>
+                        <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="personality" rows="2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="skills">Skills (comma separated)</label>
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="skills">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="isHuman" name="is_human" class="w-4 h-4 text-primary rounded focus:ring-primary">
+                        <label for="isHuman" class="text-sm font-medium text-gray-700" data-translate="isHuman">Human Role</label>
+                    </div>
+                    
+                    <div id="modelSection">
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="model">Model</label>
+                        <select class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="model_id" required></select>
+                    </div>
+                    
+                    <div id="hostRoleSection" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="hostRole">Host Role</label>
+                        <select class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="host_role_id">
+                            <option value="">None</option>
+                        </select>
+                    </div>
+                    
+                    <div id="parametersSection">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Parameters (JSON)</label>
+                        <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none font-mono text-xs" name="parameters" rows="2" placeholder='{"temperature": 0.7}'></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 rounded-b-xl">
+                <button id="cancelRoleModalBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium">Cancel</button>
+                <button id="saveRoleBtn" type="button" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg font-medium shadow-sm">Save Role</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Group Modal -->
+    <div id="addGroupModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h5 class="text-lg font-bold text-gray-800" data-translate="addNewGroup">Add New Group</h5>
+                <button id="closeGroupModalBtn" type="button" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="addGroupForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="groupName">Group Name</label>
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="name" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="meetingMode">Mode</label>
+                        <select class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="mode" required>
+                            <option value="discussion">General Discussion</option>
+                            <option value="brainstorming">Brainstorming</option>
+                            <option value="debate">Debate</option>
+                            <option value="role_playing">Role Playing</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Select Roles</label>
+                        <div id="roleCheckboxes" class="flex flex-wrap gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50 max-h-40 overflow-y-auto">
+                            <!-- Roles injected here -->
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Max Rounds</label>
+                        <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="max_rounds" value="3" min="1" max="20">
+                    </div>
+                    <div>
+                         <label class="block text-sm font-medium text-gray-700 mb-1">Summary Model</label>
+                         <select class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="summary_model_id"></select>
+                    </div>
+                </form>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 rounded-b-xl">
+                <button id="cancelGroupModalBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium">Cancel</button>
+                <button id="saveGroupBtn" type="button" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg font-medium shadow-sm">Save Group</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add API Key Modal -->
+    <div id="addApiKeyModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md">
+             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h5 class="text-lg font-bold text-gray-800">Add API Key</h5>
+                <button id="closeApiKeyModalBtn" type="button" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="addApiKeyForm" class="space-y-4">
+                    <div>
+                         <label class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                         <div class="flex gap-2">
+                             <input type="text" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="api_key" placeholder="sk-api-..." required>
+                             <button id="generateApiKeyBtn" type="button" class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600">
+                                 <i class="fas fa-magic"></i>
+                             </button>
+                         </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="description">
+                    </div>
+                </form>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 rounded-b-xl">
+                <button id="cancelApiKeyModalBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium">Close</button>
+                <button id="saveApiKeyBtn" type="button" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg font-medium shadow-sm">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+    
+    <!-- Loading Spinner -->
+    <div class="loading-spinner fixed inset-0 bg-white/80 backdrop-blur-sm hidden items-center justify-center z-50" id="loadingSpinner">
+        <div class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+            <p class="mt-4 text-primary font-medium">Processing...</p>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Field, validator
 from typing import Optional, Dict, Union, List
 import json
+from datetime import datetime
+
 
 class ModelBase(BaseModel):
     name: str
@@ -19,57 +21,21 @@ class ModelBase(BaseModel):
     tool_choice: Optional[Dict] = None
     enable_thinking: bool = False
     thinking_budget_tokens: int = 16000
-    custom_parameters: Optional[Dict[str, Union[str, int, float, bool]]] = Field(default_factory=dict)
-
-    @validator('temperature', 'top_p', pre=True)
-    def convert_to_float(cls, v):
-        if isinstance(v, str):
-            return float(v)
-        return v
-
-    @validator('type')
-    def validate_type(cls, v):
-        valid_types = {'reasoning', 'execution', 'both'}
-        if v.lower() not in valid_types:
-            raise ValueError(f'Type must be one of {valid_types}')
-        return v.lower()
-
-    @validator('provider')
-    def validate_provider(cls, v):
-        valid_providers = {
-            'deepseek', 'google', 'anthropic', 'oneapi', 
-            'openrouter', '腾讯云', 'grok3', 'openai-completion', 'other'
-        }
-        if v.lower() not in valid_providers:
-            raise ValueError(f'Provider must be one of {valid_providers}')
-        return v.lower()
-
-    @validator('tools', 'tool_choice', pre=True)
-    def validate_json_fields(cls, v):
-        if isinstance(v, str):
-            try:
-                return json.loads(v)
-            except:
-                return None
-        return v
-
-    @validator('custom_parameters', pre=True)
-    def validate_custom_parameters(cls, v):
-        if isinstance(v, str):
-            try:
-                return json.loads(v)
-            except:
-                return {}
-        return v if isinstance(v, dict) else {}
+    custom_parameters: Optional[Dict[str, Union[str, int, float, bool]]] = Field(
+        default_factory=dict
+    )
 
     class Config:
-        from_attributes = True
+        orm_mode = True
+
 
 class ModelCreate(ModelBase):
     pass
 
+
 class Model(ModelBase):
     id: int
+
 
 class ConfigurationStepBase(BaseModel):
     model_id: int
@@ -77,27 +43,50 @@ class ConfigurationStepBase(BaseModel):
     step_order: int
     system_prompt: str = ""
 
+
 class ConfigurationStepCreate(ConfigurationStepBase):
     pass
+
 
 class ConfigurationStep(ConfigurationStepBase):
     id: int
     configuration_id: int
 
     class Config:
-        from_attributes = True
+        orm_mode = True
+
 
 class ConfigurationBase(BaseModel):
     name: str
     is_active: bool = True
     transfer_content: Dict = {}
 
+
 class ConfigurationCreate(ConfigurationBase):
     steps: List[ConfigurationStepCreate]
+
+
+class ConversationHistoryBase(BaseModel):
+    session_id: str
+    title: str
+    messages: List[Dict]
+
+
+class ConversationHistoryCreate(ConversationHistoryBase):
+    pass
+
+
+class ConversationHistory(ConversationHistoryBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
 
 class Configuration(ConfigurationBase):
     id: int
     steps: List[ConfigurationStep]
 
     class Config:
-        from_attributes = True
+        orm_mode = True
