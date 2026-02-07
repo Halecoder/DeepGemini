@@ -14,16 +14,19 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#2563EB', // Blue-600
-                        'primary-hover': '#1D4ED8', // Blue-700
-                        secondary: '#F3F4F6', // Gray-100
-                        'text-primary': '#1F2937', // Gray-800
-                        'text-secondary': '#4B5563', // Gray-600
-                        'text-muted': '#6B7280', // Gray-500
-                        'border-color': '#E5E7EB', // Gray-200
+                        primary: '#1E40AF', // Design System Primary
+                        'primary-hover': '#1E3A8A', // Darker Primary
+                        secondary: '#3B82F6', // Design System Secondary
+                        cta: '#22C55E', // Design System CTA/Accent
+                        'cta-hover': '#16A34A', // Darker CTA
+                        background: '#EFF6FF', // Design System Background
+                        'text-primary': '#1E3A8A', // Design System Text
+                        'text-secondary': '#475569', // Slate-600
+                        'text-muted': '#64748B', // Slate-500
+                        'border-color': '#E2E8F0', // Slate-200
                     },
                     fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
                     }
                 }
             }
@@ -32,7 +35,7 @@
     
     <!-- Icons & Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Code Highlight & Markdown -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
@@ -41,7 +44,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -50,15 +53,50 @@
         ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
         /* Chat Message Styles */
-        .message { max-width: 85%; }
-        .message.user { border-radius: 1rem 1rem 0 1rem; }
-        .message.ai { border-radius: 1rem 1rem 1rem 0; }
+        .message { 
+            max-width: 85%; 
+            transition: all 200ms ease;
+        }
+        .message.user { 
+            border-radius: 1rem 1rem 0 1rem;
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.15);
+        }
+        .message.ai { 
+            border-radius: 1rem 1rem 1rem 0;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            padding: 1rem 1.25rem;
+            color: #1E3A8A;
+        }
+        
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
         
         /* Sidebar Active State */
         .sidebar-menu li.active {
             background-color: #EFF6FF;
-            color: #2563EB;
-            border-right: 3px solid #2563EB;
+            color: #1E40AF;
+            border-right: 3px solid #1E40AF;
+        }
+        
+        .sidebar-menu li {
+            transition: all 200ms ease;
+        }
+        
+        .sidebar-menu li:hover:not(.active) {
+            background-color: #F8FAFC;
         }
 
         /* Modal Transitions */
@@ -67,43 +105,43 @@
         .modal.flex { opacity: 1; pointer-events: auto; }
     </style>
 </head>
-<body class="bg-gray-50 text-text-primary h-screen flex overflow-hidden selection:bg-blue-100">
+<body class="bg-background text-text-primary h-screen flex overflow-hidden selection:bg-blue-100">
 
     <!-- Sidebar -->
     <aside class="w-64 bg-white border-r border-border-color flex flex-col flex-shrink-0 z-20 transition-all duration-300" id="sidebar">
         <!-- Logo -->
         <div class="h-16 flex items-center px-6 border-b border-border-color">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mr-3 text-white shadow-sm">
+            <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center mr-3 text-white">
                 <i class="fas fa-sparkles text-sm"></i>
             </div>
-            <h1 class="text-xl font-bold text-gray-800 tracking-tight">DeepGemini</h1>
+            <h1 class="text-xl font-bold text-text-primary tracking-tight">DeepGemini</h1>
         </div>
 
         <!-- Navigation -->
         <div class="flex-1 overflow-y-auto py-6 px-3">
             <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Menu</h3>
             <ul class="sidebar-menu space-y-1">
-                <li data-page="chatllm" class="active flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors">
+                <li data-page="chatllm" class="active flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer transition-all">
                     <i class="fas fa-comments w-5 text-center mr-3 text-gray-400"></i>
                     <span data-translate="chatInterface">Chat</span>
                 </li>
-                <li data-page="models" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors">
+                <li data-page="models" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer transition-all">
                     <i class="fas fa-cube w-5 text-center mr-3 text-gray-400"></i>
                     <span data-translate="modelManagement">Models</span>
                 </li>
-                <li data-page="workflows" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors">
+                <li data-page="workflows" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer transition-all">
                     <i class="fas fa-project-diagram w-5 text-center mr-3 text-gray-400"></i>
                     <span data-translate="workflowManagement">Relay Chain</span>
                 </li>
-                <li data-page="roles" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors">
+                <li data-page="roles" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer transition-all">
                     <i class="fas fa-user-tag w-5 text-center mr-3 text-gray-400"></i>
                     <span data-translate="roleManagement">Roles</span>
                 </li>
-                <li data-page="groups" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors">
+                <li data-page="groups" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer transition-all">
                     <i class="fas fa-users w-5 text-center mr-3 text-gray-400"></i>
                     <span data-translate="groupManagement">Groups</span>
                 </li>
-                <li data-page="settings" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors">
+                <li data-page="settings" class="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 cursor-pointer transition-all">
                     <i class="fas fa-cog w-5 text-center mr-3 text-gray-400"></i>
                     <span data-translate="systemSettings">Settings</span>
                 </li>
@@ -113,7 +151,7 @@
             <div class="mt-8">
                 <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">History</h3>
                 <div class="space-y-1 px-1" id="history-list">
-                    <div class="px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md cursor-pointer truncate transition-colors">
+                    <div class="px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md cursor-pointer truncate transition-all">
                         <i class="far fa-comment-alt text-gray-400 mr-2"></i>
                         New Conversation
                     </div>
@@ -124,17 +162,17 @@
         <!-- Sidebar Footer -->
         <div class="p-4 border-t border-border-color bg-gray-50">
             <div class="flex items-center justify-between text-gray-500">
-                <div class="relative group cursor-pointer">
-                    <i class="fas fa-globe hover:text-primary transition-colors"></i>
+                <div class="relative group cursor-pointer hover:text-primary transition-all">
+                    <i class="fas fa-globe"></i>
                     <select id="languageSelect" class="absolute inset-0 opacity-0 cursor-pointer">
                         <option value="en">English</option>
                         <option value="zh">简体中文</option>
                     </select>
                 </div>
-                <div id="toggleThemeBtn" class="cursor-pointer hover:text-primary transition-colors">
+                <div id="toggleThemeBtn" class="cursor-pointer hover:text-primary transition-all">
                     <i class="fas fa-moon"></i>
                 </div>
-                <div id="logoutBtn" class="cursor-pointer hover:text-red-500 transition-colors">
+                <div id="logoutBtn" class="cursor-pointer hover:text-red-500 transition-all">
                     <i class="fas fa-sign-out-alt"></i>
                 </div>
             </div>
@@ -148,7 +186,7 @@
         <div id="chatllm-page" class="content-page h-full flex flex-col">
             <!-- Header -->
             <header class="h-16 flex-shrink-0 border-b border-border-color bg-white flex items-center justify-between px-6 z-10">
-                <button id="toggleSidebarBtn" class="lg:hidden mr-4 text-gray-500">
+                <button id="toggleSidebarBtn" class="lg:hidden mr-4 text-gray-500 cursor-pointer hover:text-primary transition-all">
                     <i class="fas fa-bars"></i>
                 </button>
 
@@ -178,27 +216,27 @@
             <!-- Context Bar -->
             <div class="px-6 py-3 bg-gray-50 border-b border-border-color flex items-center gap-4">
                 <div class="chat-setting-section flex-1 max-w-md" id="single-model-settings">
-                    <select class="w-full border border-gray-300 rounded-lg text-sm py-2 px-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white" id="singleModelSelect"></select>
+                    <select class="w-full border border-gray-300 rounded-lg text-sm py-2 px-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white cursor-pointer transition-all" id="singleModelSelect"></select>
                 </div>
                 <div class="chat-setting-section hidden flex-1 max-w-md" id="relay-chain-settings">
-                    <select class="w-full border border-gray-300 rounded-lg text-sm py-2 px-3 bg-white" id="relayChainSelect"></select>
+                    <select class="w-full border border-gray-300 rounded-lg text-sm py-2 px-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white cursor-pointer transition-all" id="relayChainSelect"></select>
                 </div>
                 <div class="chat-setting-section hidden flex-1 max-w-md" id="role-chat-settings">
-                    <select class="w-full border border-gray-300 rounded-lg text-sm py-2 px-3 bg-white" id="roleChatSelect"></select>
+                    <select class="w-full border border-gray-300 rounded-lg text-sm py-2 px-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white cursor-pointer transition-all" id="roleChatSelect"></select>
                 </div>
                 <div class="chat-setting-section hidden flex-1 max-w-md" id="discussion-group-settings">
-                    <select class="w-full border border-gray-300 rounded-lg text-sm py-2 px-3 bg-white" id="discussionGroupSelect"></select>
+                    <select class="w-full border border-gray-300 rounded-lg text-sm py-2 px-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white cursor-pointer transition-all" id="discussionGroupSelect"></select>
                 </div>
             </div>
 
             <!-- Messages Area -->
             <div class="flex-1 overflow-y-auto p-6 space-y-6" id="chatMessages">
                 <div class="text-center text-gray-400 mt-20">
-                    <div class="w-16 h-16 bg-blue-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div class="w-16 h-16 bg-background text-primary rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-robot text-2xl"></i>
                     </div>
-                    <h4 class="text-xl font-semibold text-gray-700" data-translate="welcomeToChat">Welcome to DeepGemini</h4>
-                    <p class="text-sm mt-2">Select a mode and start conversing.</p>
+                    <h4 class="text-xl font-semibold text-text-primary" data-translate="welcomeToChat">Welcome to DeepGemini</h4>
+                    <p class="text-sm mt-2 text-text-secondary">Select a mode and start conversing.</p>
                 </div>
                 <div id="meeting-summary-container"></div>
             </div>
@@ -214,31 +252,31 @@
                             <span class="font-bold mx-1" id="humanRoleName">Human</span>
                         </div>
                         <div class="flex gap-2">
-                            <textarea class="w-full border-purple-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 outline-none resize-y min-h-[60px]" id="humanInputMessage" placeholder="Enter your response..."></textarea>
-                            <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors whitespace-nowrap self-end" id="sendHumanInput">Submit</button>
+                            <textarea class="w-full border-purple-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 outline-none resize-y min-h-[60px] transition-all" id="humanInputMessage" placeholder="Enter your response..."></textarea>
+                            <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all whitespace-nowrap self-end cursor-pointer" id="sendHumanInput">Submit</button>
                         </div>
                     </div>
 
                     <!-- Main Input -->
                     <div class="flex items-end gap-3" id="normalChatInput">
                         <div class="flex-1 relative">
-                            <textarea class="w-full border border-gray-300 rounded-xl px-4 py-3 pr-12 bg-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-y min-h-[50px] shadow-sm" id="userMessage" placeholder="Type a message..."></textarea>
-                            <button class="absolute right-3 bottom-3 text-gray-400 hover:text-gray-600 p-1">
+                            <textarea class="w-full border border-gray-300 rounded-xl px-4 py-3 pr-12 bg-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-y min-h-[50px] shadow-sm transition-all" id="userMessage" placeholder="Type a message..."></textarea>
+                            <button class="absolute right-3 bottom-3 text-gray-400 hover:text-gray-600 p-1 cursor-pointer transition-all">
                                 <i class="fas fa-paperclip"></i>
                             </button>
                         </div>
-                        <button class="bg-primary hover:bg-primary-hover text-white rounded-xl w-12 h-12 flex items-center justify-center shadow-md transition-transform active:scale-95" id="sendMessage">
+                        <button class="bg-cta hover:bg-cta-hover text-white rounded-xl w-12 h-12 flex items-center justify-center shadow-md transition-all active:scale-95 cursor-pointer" id="sendMessage">
                             <i class="fas fa-paper-plane"></i>
                         </button>
-                        <button class="bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 rounded-xl w-12 h-12 flex items-center justify-center shadow-sm transition-colors" id="pauseBtn" title="Pause Discussion">
+                        <button class="bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 rounded-xl w-12 h-12 flex items-center justify-center shadow-sm transition-all cursor-pointer" id="pauseBtn" title="Pause Discussion">
                             <i class="fas fa-pause"></i>
                         </button>
                     </div>
 
                     <!-- Discussion Topic Input -->
                     <div class="hidden flex items-end gap-3" id="discussionTopicInput">
-                        <textarea class="flex-1 border border-gray-300 rounded-xl px-4 py-3 bg-white focus:ring-2 focus:ring-primary outline-none resize-y min-h-[50px]" id="discussionTopicMessage" placeholder="Enter discussion topic..."></textarea>
-                        <button class="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-xl font-medium shadow-md transition-colors whitespace-nowrap" id="startDiscussionBtn">Start Discussion</button>
+                        <textarea class="flex-1 border border-gray-300 rounded-xl px-4 py-3 bg-white focus:ring-2 focus:ring-primary outline-none resize-y min-h-[50px] transition-all" id="discussionTopicMessage" placeholder="Enter discussion topic..."></textarea>
+                        <button class="bg-cta hover:bg-cta-hover text-white px-6 py-3 rounded-xl font-medium shadow-md transition-all whitespace-nowrap cursor-pointer" id="startDiscussionBtn">Start Discussion</button>
                     </div>
                     
                     <div class="text-center mt-2">
@@ -249,14 +287,14 @@
         </div>
 
         <!-- ==================== MODELS PAGE ==================== -->
-        <div id="models-page" class="content-page hidden h-full overflow-y-auto bg-gray-50 p-6 md:p-8">
+        <div id="models-page" class="content-page hidden h-full overflow-y-auto bg-background p-6 md:p-8">
             <div class="max-w-7xl mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800" data-translate="modelManagement">Model Management</h2>
                         <p class="text-gray-500 mt-1">Configure and manage your AI models</p>
                     </div>
-                    <button id="add-model-btn" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg flex items-center shadow-sm transition-colors">
+                    <button id="add-model-btn" class="bg-cta hover:bg-cta-hover text-white px-4 py-2 rounded-lg flex items-center shadow-md transition-all cursor-pointer">
                         <i class="fas fa-plus mr-2"></i> <span data-translate="addNewModel">Add New Model</span>
                     </button>
                 </div>
@@ -267,14 +305,14 @@
         </div>
 
         <!-- ==================== WORKFLOWS PAGE ==================== -->
-        <div id="workflows-page" class="content-page hidden h-full overflow-y-auto bg-gray-50 p-6 md:p-8">
+        <div id="workflows-page" class="content-page hidden h-full overflow-y-auto bg-background p-6 md:p-8">
             <div class="max-w-7xl mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800" data-translate="workflowManagement">Workflow Management</h2>
                         <p class="text-gray-500 mt-1" data-translate="workflowDescription">Configure and manage your AI model workflows</p>
                     </div>
-                    <button id="add-config-btn" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg flex items-center shadow-sm transition-colors">
+                    <button id="add-config-btn" class="bg-cta hover:bg-cta-hover text-white px-4 py-2 rounded-lg flex items-center shadow-md transition-all cursor-pointer">
                         <i class="fas fa-plus mr-2"></i> <span data-translate="addNewWorkflow">Add New Workflow</span>
                     </button>
                 </div>
@@ -285,14 +323,14 @@
         </div>
 
         <!-- ==================== ROLES PAGE ==================== -->
-        <div id="roles-page" class="content-page hidden h-full overflow-y-auto bg-gray-50 p-6 md:p-8">
+        <div id="roles-page" class="content-page hidden h-full overflow-y-auto bg-background p-6 md:p-8">
             <div class="max-w-7xl mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800" data-translate="roleManagement">Role Management</h2>
                         <p class="text-gray-500 mt-1" data-translate="roleDescription">Create and manage AI roles</p>
                     </div>
-                    <button id="add-role-btn" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg flex items-center shadow-sm transition-colors">
+                    <button id="add-role-btn" class="bg-cta hover:bg-cta-hover text-white px-4 py-2 rounded-lg flex items-center shadow-md transition-all cursor-pointer">
                         <i class="fas fa-plus mr-2"></i> <span data-translate="addRole">Add Role</span>
                     </button>
                 </div>
@@ -303,14 +341,14 @@
         </div>
 
         <!-- ==================== GROUPS PAGE ==================== -->
-        <div id="groups-page" class="content-page hidden h-full overflow-y-auto bg-gray-50 p-6 md:p-8">
+        <div id="groups-page" class="content-page hidden h-full overflow-y-auto bg-background p-6 md:p-8">
             <div class="max-w-7xl mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-2xl font-bold text-gray-800" data-translate="groupManagement">Group Management</h2>
                         <p class="text-gray-500 mt-1" data-translate="groupDescription">Create and manage discussion groups</p>
                     </div>
-                    <button id="add-group-btn" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg flex items-center shadow-sm transition-colors">
+                    <button id="add-group-btn" class="bg-cta hover:bg-cta-hover text-white px-4 py-2 rounded-lg flex items-center shadow-md transition-all cursor-pointer">
                         <i class="fas fa-plus mr-2"></i> <span data-translate="addGroup">Add Group</span>
                     </button>
                 </div>
@@ -321,13 +359,13 @@
         </div>
 
         <!-- ==================== SETTINGS PAGE ==================== -->
-        <div id="settings-page" class="content-page hidden h-full overflow-y-auto bg-gray-50 p-6 md:p-8">
+        <div id="settings-page" class="content-page hidden h-full overflow-y-auto bg-background p-6 md:p-8">
             <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-border-color overflow-hidden flex min-h-[600px]">
                 <!-- Settings Sidebar -->
                 <div class="w-64 bg-gray-50 border-r border-border-color p-4">
                     <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2">Settings</h3>
                     <div class="space-y-1 settings-nav">
-                        <div class="settings-nav-item active px-3 py-2 text-sm font-medium rounded-md cursor-pointer bg-white text-primary shadow-sm" data-section="api-keys">
+                        <div class="settings-nav-item active px-3 py-2 text-sm font-medium rounded-md cursor-pointer bg-white text-primary shadow-sm transition-all" data-section="api-keys">
                             <i class="fas fa-key w-5 text-center mr-2"></i> API Keys
                         </div>
                         <div class="settings-nav-item px-3 py-2 text-sm font-medium rounded-md cursor-pointer text-gray-600 hover:bg-white hover:shadow-sm transition-all" data-section="general">
@@ -342,7 +380,7 @@
                     <div class="settings-section active" id="api-keys-section">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="text-xl font-bold text-gray-800" data-translate="apiKeyManagement">API Key Management</h3>
-                            <button id="add-apikey-btn" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                            <button id="add-apikey-btn" class="bg-cta hover:bg-cta-hover text-white px-4 py-2 rounded-lg text-sm transition-all cursor-pointer">
                                 <i class="fas fa-plus mr-1"></i> Add Key
                             </button>
                         </div>
@@ -359,17 +397,17 @@
                             <form id="credentialsForm" class="space-y-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="currentPassword">Current Password</label>
-                                    <input type="password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="current_password" required>
+                                    <input type="password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="current_password" required>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="newUsername">New Username</label>
-                                    <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="new_username">
+                                    <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="new_username">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="newPassword">New Password</label>
-                                    <input type="password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="new_password">
+                                    <input type="password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="new_password">
                                 </div>
-                                <button id="updateCredentialsBtn" type="button" class="bg-primary hover:bg-primary-hover text-white px-6 py-2 rounded-lg mt-2 transition-colors">
+                                <button id="updateCredentialsBtn" type="button" class="bg-cta hover:bg-cta-hover text-white px-6 py-2 rounded-lg mt-2 transition-all cursor-pointer">
                                     <span data-translate="updateCredentials">Update</span>
                                 </button>
                             </form>
@@ -383,14 +421,14 @@
     <!-- ==================== MODALS ==================== -->
     
     <!-- Modal Overlay Backdrop (Shared) -->
-    <div id="modalBackdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+    <div id="modalBackdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden transition-all duration-200"></div>
 
     <!-- Add Model Modal -->
-    <div id="addModelModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div id="addModelModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4 transition-all duration-200">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
-                <h5 class="text-lg font-bold text-gray-800" data-translate="addNewModel">Add New Model</h5>
-                <button id="closeAddModelBtn" type="button" class="text-gray-400 hover:text-gray-600">
+                <h5 class="text-lg font-bold text-text-primary" data-translate="addNewModel">Add New Model</h5>
+                <button id="closeAddModelBtn" type="button" class="text-gray-400 hover:text-gray-600 cursor-pointer transition-all">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -399,26 +437,26 @@
                     <input type="hidden" name="model_id">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="customName">Custom Name</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="name" required placeholder="Enter custom name">
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="name" required placeholder="Enter custom name">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
-                            <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="api_key" required placeholder="sk-...">
+                            <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="api_key" required placeholder="sk-...">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">API URL</label>
-                            <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="api_url" required placeholder="https://api.example.com/v1">
+                            <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="api_url" required placeholder="https://api.example.com/v1">
                         </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Model Name</label>
                         <div class="flex gap-2">
-                            <select class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" id="modelNameSelect">
+                            <select class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer transition-all" id="modelNameSelect">
                                 <option value="">Enter credentials first</option>
                             </select>
-                            <input type="text" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none hidden" id="modelNameInput" name="model_name" placeholder="Enter manually">
-                            <button id="toggleModelNameInputBtn" type="button" class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600">
+                            <input type="text" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none hidden transition-all" id="modelNameInput" name="model_name" placeholder="Enter manually">
+                            <button id="toggleModelNameInputBtn" type="button" class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600 cursor-pointer transition-all">
                                 <i class="fas fa-pen"></i>
                             </button>
                         </div>
@@ -427,7 +465,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                            <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="type">
+                            <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer transition-all" name="type">
                                 <option value="reasoning">Reasoning</option>
                                 <option value="execution">Execution</option>
                                 <option value="both">Both</option>
@@ -435,7 +473,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Provider</label>
-                            <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="provider">
+                            <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer transition-all" name="provider">
                                 <option value="deepseek">DeepSeek</option>
                                 <option value="google">Google</option>
                                 <option value="anthropic">Anthropic</option>
@@ -448,11 +486,11 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Temperature</label>
-                            <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none" name="temperature" value="0.7" step="0.1">
+                            <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="temperature" value="0.7" step="0.1">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Top P</label>
-                            <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none" name="top_p" value="1.0" step="0.1">
+                            <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="top_p" value="1.0" step="0.1">
                         </div>
                     </div>
                     <!-- Checkboxes -->
@@ -469,37 +507,37 @@
                     <!-- Tools Config (Hidden by default) -->
                     <div id="toolsConfig" class="hidden space-y-3 bg-gray-50 p-4 rounded-lg">
                          <label class="block text-sm font-medium text-gray-700">Tools JSON</label>
-                         <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 font-mono text-xs" name="tools" rows="3"></textarea>
+                         <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 font-mono text-xs focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="tools" rows="3"></textarea>
                     </div>
                     <!-- Thinking Config (Hidden by default) -->
                     <div id="thinkingConfig" class="hidden bg-gray-50 p-4 rounded-lg">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Budget Tokens</label>
-                        <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-2" name="thinking_budget_tokens" value="16000">
+                        <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="thinking_budget_tokens" value="16000">
                     </div>
                     
                     <!-- Custom Params -->
                     <div>
                          <label class="block text-sm font-medium text-gray-700 mb-2">Custom Parameters</label>
                          <div id="customParametersContainer" class="space-y-2"></div>
-                         <button id="addCustomParamBtn" type="button" class="mt-2 text-sm text-primary hover:text-primary-hover font-medium">
+                         <button id="addCustomParamBtn" type="button" class="mt-2 text-sm text-primary hover:text-primary-hover font-medium cursor-pointer transition-all">
                              <i class="fas fa-plus mr-1"></i> Add Parameter
                          </button>
                     </div>
                 </form>
             </div>
             <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 rounded-b-xl">
-                <button id="cancelAddModelBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium">Cancel</button>
-                <button id="saveModelBtn" type="button" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg font-medium shadow-sm">Save Model</button>
+                <button id="cancelAddModelBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium cursor-pointer transition-all">Cancel</button>
+                <button id="saveModelBtn" type="button" class="px-4 py-2 bg-cta hover:bg-cta-hover text-white rounded-lg font-medium shadow-md cursor-pointer transition-all">Save Model</button>
             </div>
         </div>
     </div>
 
     <!-- Add Configuration Modal -->
-    <div id="addConfigModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+    <div id="addConfigModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4 transition-all duration-200">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
-                <h5 class="text-lg font-bold text-gray-800">Add New Relay Chain</h5>
-                <button id="closeConfigModalBtn" type="button" class="text-gray-400 hover:text-gray-600">
+                <h5 class="text-lg font-bold text-text-primary">Add New Relay Chain</h5>
+                <button id="closeConfigModalBtn" type="button" class="text-gray-400 hover:text-gray-600 cursor-pointer transition-all">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -508,8 +546,8 @@
                     <input type="hidden" name="config_id">
                     <div class="flex gap-4 items-center">
                         <div class="flex-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                            <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none" name="name" required>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="name" required>
                         </div>
                         <label class="flex items-center gap-2 cursor-pointer mt-6">
                             <input type="checkbox" name="is_active" value="true" checked class="w-4 h-4 text-primary rounded focus:ring-primary">
@@ -521,24 +559,24 @@
                         <!-- Steps injected here -->
                     </div>
                     
-                    <button id="addConfigStepBtn" type="button" class="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-primary hover:text-primary transition-colors font-medium flex items-center justify-center">
+                    <button id="addConfigStepBtn" type="button" class="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-primary hover:text-primary transition-all font-medium flex items-center justify-center cursor-pointer">
                         <i class="fas fa-plus mr-2"></i> Add Step
                     </button>
                 </form>
             </div>
             <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 rounded-b-xl">
-                <button id="cancelConfigModalBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium">Close</button>
-                <button id="saveConfigBtn" type="button" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg font-medium shadow-sm">Save</button>
+                <button id="cancelConfigModalBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium cursor-pointer transition-all">Close</button>
+                <button id="saveConfigBtn" type="button" class="px-4 py-2 bg-cta hover:bg-cta-hover text-white rounded-lg font-medium shadow-md cursor-pointer transition-all">Save</button>
             </div>
         </div>
     </div>
 
     <!-- Add Role Modal -->
-    <div id="addRoleModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div id="addRoleModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4 transition-all duration-200">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
-                <h5 class="text-lg font-bold text-gray-800" data-translate="addNewRole">Add New Role</h5>
-                <button id="closeRoleModalBtn" type="button" class="text-gray-400 hover:text-gray-600">
+                <h5 class="text-lg font-bold text-text-primary" data-translate="addNewRole">Add New Role</h5>
+                <button id="closeRoleModalBtn" type="button" class="text-gray-400 hover:text-gray-600 cursor-pointer transition-all">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -546,19 +584,19 @@
                 <form id="addRoleForm" class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="roleName">Role Name</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="name" required>
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="name" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="roleDescription">Description</label>
-                        <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="description" rows="2"></textarea>
+                        <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="description" rows="2"></textarea>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="personality">Personality</label>
-                        <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="personality" rows="2"></textarea>
+                        <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="personality" rows="2"></textarea>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="skills">Skills (comma separated)</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="skills">
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="skills">
                     </div>
                     <div class="flex items-center gap-2">
                         <input type="checkbox" id="isHuman" name="is_human" class="w-4 h-4 text-primary rounded focus:ring-primary">
@@ -567,35 +605,35 @@
                     
                     <div id="modelSection">
                         <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="model">Model</label>
-                        <select class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="model_id" required></select>
+                        <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer transition-all" name="model_id" required></select>
                     </div>
                     
                     <div id="hostRoleSection" class="hidden">
                         <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="hostRole">Host Role</label>
-                        <select class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="host_role_id">
+                        <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer transition-all" name="host_role_id">
                             <option value="">None</option>
                         </select>
                     </div>
                     
                     <div id="parametersSection">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Parameters (JSON)</label>
-                        <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none font-mono text-xs" name="parameters" rows="2" placeholder='{"temperature": 0.7}'></textarea>
+                        <textarea class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none font-mono text-xs transition-all" name="parameters" rows="2" placeholder='{"temperature": 0.7}'></textarea>
                     </div>
                 </form>
             </div>
             <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 rounded-b-xl">
-                <button id="cancelRoleModalBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium">Cancel</button>
-                <button id="saveRoleBtn" type="button" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg font-medium shadow-sm">Save Role</button>
+                <button id="cancelRoleModalBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium cursor-pointer transition-all">Cancel</button>
+                <button id="saveRoleBtn" type="button" class="px-4 py-2 bg-cta hover:bg-cta-hover text-white rounded-lg font-medium shadow-md cursor-pointer transition-all">Save Role</button>
             </div>
         </div>
     </div>
 
     <!-- Add Group Modal -->
-    <div id="addGroupModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+    <div id="addGroupModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4 transition-all duration-200">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
-                <h5 class="text-lg font-bold text-gray-800" data-translate="addNewGroup">Add New Group</h5>
-                <button id="closeGroupModalBtn" type="button" class="text-gray-400 hover:text-gray-600">
+                <h5 class="text-lg font-bold text-text-primary" data-translate="addNewGroup">Add New Group</h5>
+                <button id="closeGroupModalBtn" type="button" class="text-gray-400 hover:text-gray-600 cursor-pointer transition-all">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -603,11 +641,11 @@
                 <form id="addGroupForm" class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="groupName">Group Name</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="name" required>
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="name" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="meetingMode">Mode</label>
-                        <select class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="mode" required>
+                        <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer transition-all" name="mode" required>
                             <option value="discussion">General Discussion</option>
                             <option value="brainstorming">Brainstorming</option>
                             <option value="debate">Debate</option>
@@ -622,27 +660,27 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Max Rounds</label>
-                        <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="max_rounds" value="3" min="1" max="20">
+                        <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="max_rounds" value="3" min="1" max="20">
                     </div>
                     <div>
                          <label class="block text-sm font-medium text-gray-700 mb-1">Summary Model</label>
-                         <select class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="summary_model_id"></select>
+                         <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer transition-all" name="summary_model_id"></select>
                     </div>
                 </form>
             </div>
             <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 rounded-b-xl">
-                <button id="cancelGroupModalBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium">Cancel</button>
-                <button id="saveGroupBtn" type="button" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg font-medium shadow-sm">Save Group</button>
+                <button id="cancelGroupModalBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium cursor-pointer transition-all">Cancel</button>
+                <button id="saveGroupBtn" type="button" class="px-4 py-2 bg-cta hover:bg-cta-hover text-white rounded-lg font-medium shadow-md cursor-pointer transition-all">Save Group</button>
             </div>
         </div>
     </div>
     
     <!-- Add API Key Modal -->
-    <div id="addApiKeyModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div id="addApiKeyModal" class="modal fixed inset-0 z-50 hidden items-center justify-center p-4 transition-all duration-200">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-md">
              <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                <h5 class="text-lg font-bold text-gray-800">Add API Key</h5>
-                <button id="closeApiKeyModalBtn" type="button" class="text-gray-400 hover:text-gray-600">
+                <h5 class="text-lg font-bold text-text-primary">Add API Key</h5>
+                <button id="closeApiKeyModalBtn" type="button" class="text-gray-400 hover:text-gray-600 cursor-pointer transition-all">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -651,21 +689,21 @@
                     <div>
                          <label class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
                          <div class="flex gap-2">
-                             <input type="text" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="api_key" placeholder="sk-api-..." required>
-                             <button id="generateApiKeyBtn" type="button" class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600">
-                                 <i class="fas fa-magic"></i>
-                             </button>
+                             <input type="text" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="api_key" placeholder="sk-api-..." required>
+                              <button id="generateApiKeyBtn" type="button" class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600 cursor-pointer transition-all">
+                                  <i class="fas fa-magic"></i>
+                              </button>
                          </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary" name="description">
+                        <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" name="description">
                     </div>
                 </form>
             </div>
             <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 rounded-b-xl">
-                <button id="cancelApiKeyModalBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium">Close</button>
-                <button id="saveApiKeyBtn" type="button" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg font-medium shadow-sm">Save</button>
+                <button id="cancelApiKeyModalBtn" type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium cursor-pointer transition-all">Close</button>
+                <button id="saveApiKeyBtn" type="button" class="px-4 py-2 bg-cta hover:bg-cta-hover text-white rounded-lg font-medium shadow-md cursor-pointer transition-all">Save</button>
             </div>
         </div>
     </div>
@@ -680,6 +718,22 @@
             <p class="mt-4 text-primary font-medium">Processing...</p>
         </div>
     </div>
+    
+    <style>
+        /* Reduce motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .skeleton {
+                animation: none;
+                background: #E2E8F0;
+            }
+        }
+    </style>
 
     <script src="js/app.js"></script>
 </body>
