@@ -316,30 +316,30 @@
 
 /* Dark theme overrides */
 body.dark-theme .chat-container {
-    --bg-color: #1e1e1e;
+    --bg-color: #171717;
     --border-color: #404040;
-    --header-bg: #252525;
-    --chat-bg: #1e1e1e;
-    --text-muted: #a0a0a0;
-    --heading-color: #e1e1e1;
-    --user-message-bg: #0d6efd;
+    --header-bg: #1f1f1f;
+    --chat-bg: #171717;
+    --text-muted: #9ca3af;
+    --heading-color: #f3f4f6;
+    --user-message-bg: #1e40af;
     --user-message-color: #fff;
-    --ai-message-bg: #2d2d2d;
-    --ai-message-color: #e1e1e1;
-    --system-message-bg: #505050;
+    --ai-message-bg: #262626;
+    --ai-message-color: #f3f4f6;
+    --system-message-bg: #404040;
     --system-message-color: #fff;
     --input-border: #404040;
-    --input-bg: #333;
-    --input-color: #e1e1e1;
-    --agent-border: #0d6efd;
-    --agent-name: #0d6efd;
-    --agent-badge-bg: #1a3a5f;
-    --agent-badge-color: #7caeff;
-    --agent-content-bg: #2d2d2d;
-    --human-input-bg: #252525;
-    --primary: #0d6efd;
+    --input-bg: #262626;
+    --input-color: #f3f4f6;
+    --agent-border: #1e40af;
+    --agent-name: #3b82f6;
+    --agent-badge-bg: #1e3a8a;
+    --agent-badge-color: #93c5fd;
+    --agent-content-bg: #262626;
+    --human-input-bg: #1f1f1f;
+    --primary: #1e40af;
     --round-border: #404040;
-    --round-marker: #0d6efd;
+    --round-marker: #3b82f6;
 }
 
 body.dark-theme .loading-spinner {

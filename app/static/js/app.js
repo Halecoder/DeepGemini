@@ -261,8 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize theme
     const savedTheme = localStorage.getItem('theme') || 'light';
     if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
+        document.body.classList.add('dark-theme');
     }
 });
 
@@ -463,7 +462,17 @@ async function saveModel() {
         } catch (e) {
             data.tools = [];
         }
+    } else {
+        data.tools = [];
     }
+    
+    // Add required fields with defaults
+    data.max_tokens = parseInt(data.max_tokens) || 2000;
+    data.temperature = parseFloat(data.temperature) || 0.7;
+    data.top_p = parseFloat(data.top_p) || 1.0;
+    data.presence_penalty = parseFloat(data.presence_penalty) || 0.0;
+    data.frequency_penalty = parseFloat(data.frequency_penalty) || 0.0;
+    data.thinking_budget_tokens = parseInt(data.thinking_budget_tokens) || 16000;
     
     // Handle custom params
     const customParams = {};
@@ -1024,14 +1033,12 @@ function changeLanguage(lang) {
 }
 
 function toggleTheme() {
-    const html = document.documentElement;
-    if (html.classList.contains('dark')) {
-        html.classList.remove('dark');
-        document.body.classList.remove('dark');
+    const body = document.body;
+    if (body.classList.contains('dark-theme')) {
+        body.classList.remove('dark-theme');
         localStorage.setItem('theme', 'light');
     } else {
-        html.classList.add('dark');
-        document.body.classList.add('dark');
+        body.classList.add('dark-theme');
         localStorage.setItem('theme', 'dark');
     }
 }

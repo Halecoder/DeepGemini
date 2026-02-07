@@ -51,7 +51,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const humanInputMessage = document.getElementById('humanInputMessage');
     const sendHumanInputBtn = document.getElementById('sendHumanInput');
     const loadingSpinner = document.getElementById('loadingSpinner');
-    const pauseBtn = document.getElementById('pauseBtn'); // New Pause Button
+    const pauseBtn = document.getElementById('pauseBtn');
+    const newChatBtn = document.getElementById('newChatBtn');
 
     // Create Scroll Control Button
     const scrollControl = document.createElement('div');
@@ -111,6 +112,26 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (pauseBtn) {
         pauseBtn.addEventListener('click', togglePauseDiscussion);
+    }
+    
+    if (newChatBtn) {
+        newChatBtn.addEventListener('click', startNewChat);
+    }
+    
+    // Theme toggle
+    const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+    if (toggleThemeBtn) {
+        toggleThemeBtn.addEventListener('click', function() {
+            document.body.classList.toggle('dark-theme');
+            const isDark = document.body.classList.contains('dark-theme');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+    }
+    
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
     }
     
     if (userMessage) {
@@ -225,6 +246,12 @@ document.addEventListener("DOMContentLoaded", function() {
         if (settingSection) settingSection.classList.remove('d-none');
         
         resetChat();
+        
+        // Hide pause button when switching modes
+        if (pauseBtn) {
+            pauseBtn.classList.add('hidden');
+            pauseBtn.classList.remove('flex');
+        }
         
         // Toggle Inputs based on mode
         const normalChatInput = document.getElementById('normalChatInput');
@@ -368,10 +395,38 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
     
+    // Start New Chat
+    function startNewChat() {
+        resetChat();
+        if (userMessage) userMessage.focus();
+    }
+    
+    // Reset Chat
+    function resetChat() {
+        messageHistory = [];
+        if (chatMessages) {
+            const summaryContainer = document.getElementById('meeting-summary-container');
+            chatMessages.innerHTML = '';
+            if (summaryContainer) {
+                chatMessages.appendChild(summaryContainer);
+            }
+        }
+        if (pauseBtn) {
+            pauseBtn.classList.add('hidden');
+            pauseBtn.classList.remove('flex');
+        }
+    }
+    
     // Send Message
     async function sendMessage() {
         const message = userMessage.value.trim();
         if (!message) return;
+        
+        // Show pause button when chat starts
+        if (pauseBtn && currentChatMode === 'group') {
+            pauseBtn.classList.remove('hidden');
+            pauseBtn.classList.add('flex');
+        }
         
         showLoading();
         addMessageToChat('user', message);
